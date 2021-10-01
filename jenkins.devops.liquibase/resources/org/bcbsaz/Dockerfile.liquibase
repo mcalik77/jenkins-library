@@ -1,0 +1,15 @@
+ARG LIQUIBASE_VERSION
+FROM liquibase/liquibase:$LIQUIBASE_VERSION
+
+USER root
+
+RUN addgroup --gid 986 jenkins \
+ && adduser \
+   --disabled-password \
+   --ingroup jenkins \
+   --uid 990 \
+   --gecos "" jenkins
+
+USER jenkins:jenkins
+
+ENTRYPOINT []

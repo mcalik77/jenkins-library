@@ -1,0 +1,33 @@
+ARG TERRAFORM_VERSION
+FROM hashicorp/terraform:$TERRAFORM_VERSION
+
+RUN apk --update --no-cache add \
+  bash \
+  coreutils \
+  curl \
+  bind-tools \
+  jq \
+  py3-pip \
+ && apk --update --virtual build add \
+   gcc \
+   libffi-dev \
+   make \
+   musl-dev \
+   openssl-dev \
+   python3-dev \
+ && pip3 --no-cache-dir install --upgrade pip \
+ && pip3 --no-cache-dir install azure-cli \
+ && apk --purge del build \
+ && addgroup --gid 986 jenkins \
+ && adduser \
+   --disabled-password \
+   --ingroup jenkins \
+   --uid 990 jenkins
+
+USER jenkins:jenkins
+
+RUN az extension add --name datafactory 2>&1 \
+ && az extension add --name eventgrid 2>&1 \
+ && az extension add --name application-insights 2>&1
+
+ENTRYPOINT []

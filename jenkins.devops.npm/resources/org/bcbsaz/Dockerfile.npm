@@ -1,0 +1,26 @@
+ARG NODE_VERSION
+FROM node:${NODE_VERSION}-alpine
+
+ENV NEXUS_URL='https://lp-nex-a01.corp.net.bcbsaz.com:8443'
+
+ENV CERT_FILE='bcbsaz.pem'
+ENV CERT_URL="${NEXUS_URL}/repository/raw/certificates/$CERT_FILE"
+
+RUN apk --update --no-cache add bash curl chromium openjdk11 \
+ && wget --no-check-certificate $CERT_URL \
+ && mv $CERT_FILE /usr/local/share/ca-certificates/ \
+ && update-ca-certificates \
+ && addgroup --gid 986 jenkins \
+ && adduser \
+   --disabled-password \
+   --ingroup jenkins \
+   --uid 990 jenkins
+
+USER jenkins:jenkins
+
+RUN npm config set prefix '~/.local/' \
+ && npm install -g @angular/cli
+
+ENV PATH="${PATH}:/home/jenkins/.local/bin"
+
+ENV CHROME_BIN="/usr/bin/chromium-browser"

@@ -1,0 +1,21 @@
+FROM debian:latest
+
+RUN apt-get update \
+ && apt-get install --yes \
+   curl \
+   git \
+   unzip \
+   wget \
+   gnupg \
+ && rm --recursive --force /var/lib/apt/lists/* \
+ && wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.0.0-beta1/flyway-commandline-8.0.0-beta1-linux-x64.tar.gz | tar xvz &&  ln -s `pwd`/flyway-8.0.0-beta1/flyway /usr/local/bin \
+ && addgroup --gid 986 jenkins \
+ && adduser \
+  --disabled-password \
+  --ingroup jenkins \
+  --uid 990 \
+  --gecos "" jenkins \
+ && chown jenkins `pwd`/flyway-8.0.0-beta1/flyway \
+ && chown jenkins /usr/local/bin/flyway 
+ 
+USER jenkins:jenkins

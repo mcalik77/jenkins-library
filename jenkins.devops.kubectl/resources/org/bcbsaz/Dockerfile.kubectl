@@ -1,0 +1,26 @@
+FROM debian:latest
+
+ARG KUBECTL_VERSION
+
+ENV KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+
+RUN apt-get update \
+ && apt-get install --yes \
+   curl \
+   git \
+   unzip \
+   wget \
+ && rm --recursive --force /var/lib/apt/lists/* \
+ && addgroup --gid 986 jenkins \
+ && adduser \
+  --disabled-password \
+  --ingroup jenkins \
+  --uid 990 \
+  --gecos "" jenkins \
+ && curl --location https://aka.ms/InstallAzureCLIDeb | bash \
+ && az aks install-cli \
+ && curl -LO "$KUBECTL_URL" \
+ && chmod +x ./kubectl \
+ && mv ./kubectl /usr/local/bin/kubectl
+
+USER jenkins:jenkins
